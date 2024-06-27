@@ -1,8 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
-	id "com.matthewprenger.cursegradle" version "1.4.0"
-	id "com.modrinth.minotaur" version "2.+"
 }
 
 repositories {
@@ -57,75 +55,4 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
-}
-
-
-// from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
-curseforge {
-	if (ENV.CURSEFORGE_API_KEY) {
-		apiKey = ENV.CURSEFORGE_API_KEY
-	}
-
-	project {
-		id = "366500"
-		changelog = "A changelog can be found at https://github.com/samolego/CommandSpy/releases/latest"
-		releaseType = "release"
-		addGameVersion "${project.minecraft_version}"
-		addGameVersion "Fabric"
-
-		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
-			displayName = "[${project.minecraft_version}] CommandSpy ${version}"
-		}
-
-		afterEvaluate {
-			uploadTask.dependsOn("remapJar")
-		}
-	}
-
-	options {
-		forgeGradleIntegration = false
-	}
-}
-
-tasks.modrinth {
-	onlyIf {
-		ENV.MODRINTH_TOKEN
-	}
-}
-
-modrinth {
-	token = ENV.MODRINTH_TOKEN
-	projectId = "4XnUc5Gr"
-	changelog = "A changelog can be found at https://github.com/samolego/CommandSpy/releases/latest"
-	versionNumber = version
-	versionName = "[${project.minecraft_version}] CommandSpy ${version}"
-	versionType = "release"
-
-	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
-
-	gameVersions = [project.minecraft_version]
-	loaders = ['fabric', 'quilt']
 }
