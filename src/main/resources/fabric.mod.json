@@ -5,9 +5,7 @@
 
   "name": "Command Spy",
   "description": "Mod that logs player and command block commands to console.",
-  "authors": [
-    "samo_lego"
-  ],
+  "authors": ["samo_lego"],
   "contact": {
     "homepage": "https://github.com/samolego/CommandSpy",
     "sources": "https://github.com/samolego/CommandSpy"
@@ -18,15 +16,11 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "org.samo_lego.commandspy.CommandSpy"
-    ]
+    "main": ["org.samo_lego.commandspy.CommandSpy"]
   },
-  "mixins": [
-    "mixins.cmdspy.json"
-  ],
+  "mixins": ["mixins.cmdspy.json"],
 
   "depends": {
-    "fabricloader": ">=0.7.4"
+    "fabricloader": ">=0.15.11"
   }
 }

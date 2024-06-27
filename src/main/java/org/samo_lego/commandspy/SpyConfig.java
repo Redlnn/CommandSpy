@@ -15,6 +15,57 @@ import java.util.List;
 
 public class SpyConfig {
 
+    // Logger and gson initalizing
+    private static final Logger LOGGER = (Logger) LogManager.getLogger();
+    // GSON initializing with nice printing options :P
+    private static final Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .create();
+    public LogConfig logging = new LogConfig();
+    public MessageConfig messages = new MessageConfig();
+    public List<String> blacklistedCommands = new ArrayList<>(Arrays.asList(
+            "msg",
+            "w",
+            "testCommandThatShouldNotBeLogged"
+    ));
+
+    /**
+     * Loads config from specified file
+     *
+     * @param file config file
+     * @return config as SpyConfig object
+     */
+    public static SpyConfig loadConfig(File file) {
+        SpyConfig config;
+
+        if (file.exists()) {
+            try (FileReader fileReader = new FileReader(file)) {
+                config = gson.fromJson(fileReader, SpyConfig.class);
+            } catch (IOException e) {
+                throw new RuntimeException("[CommandSpy] An error occured:", e);
+            }
+        } else {
+            config = new SpyConfig();
+        }
+        config.save(file);
+
+        return config;
+    }
+
+    /**
+     * Saves config to provided path (file)
+     *
+     * @param file location where to save config
+     */
+    private void save(File file) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            gson.toJson(this, fileWriter);
+        } catch (IOException e) {
+            LOGGER.error("[CommandSpy] An error occured:", e);
+        }
+    }
+
     public static class LogConfig {
 
         /**
@@ -61,57 +112,5 @@ public class SpyConfig {
          * Message that is sent when command from sign is executed
          */
         public String signMessageStyle = "Sign in: ${dimension} at X: ${x} Y: ${y} Z: ${z} executed command: ${command}";
-    }
-
-    public LogConfig logging = new LogConfig();
-    public MessageConfig messages = new MessageConfig();
-    public List<String> blacklistedCommands = new ArrayList<>(Arrays.asList(
-            "msg",
-            "w",
-            "testCommandThatShouldNotBeLogged"
-    ));
-
-    // Logger and gson initalizing
-    private static final Logger LOGGER = (Logger) LogManager.getLogger();
-
-    // GSON initializing with nice printing options :P
-    private static final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
-
-    /**
-     * Loads config from specified file
-     * @param file config file
-     * @return config as SpyConfig object
-     */
-    public static SpyConfig loadConfig(File file) {
-        SpyConfig config;
-
-        if (file.exists()) {
-            try (FileReader fileReader = new FileReader(file)){
-                config = gson.fromJson(fileReader, SpyConfig.class);
-            } catch (IOException e) {
-                throw new RuntimeException("[CommandSpy] An error occured:", e);
-            }
-        }
-        else {
-            config = new SpyConfig();
-        }
-        config.save(file);
-
-        return config;
-    }
-
-    /**
-     * Saves config to provided path (file)
-     * @param file location where to save config
-     */
-    private void save(File file) {
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            gson.toJson(this, fileWriter);
-        } catch (IOException e) {
-            LOGGER.error("[CommandSpy] An error occured:", e);
-        }
     }
 }

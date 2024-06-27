@@ -1,15 +1,15 @@
 {
   "required": true,
-  "minVersion": "0.8",
   "package": "org.samo_lego.commandspy.mixin",
-  "compatibilityLevel": "JAVA_16",
-  "mixins": [
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [],
+  "server": [
     "MixinCommandBlockExecutor",
     "MixinServerPlayNetworkHandler",
     "ServerCommandSourceAccessor",
     "SignBlockEntityMixin"
   ],
-  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

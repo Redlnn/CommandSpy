@@ -1,13 +1,12 @@
 package org.samo_lego.commandspy.mixin;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.block.entity.SignBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.jetbrains.annotations.Nullable;
 import org.samo_lego.commandspy.CommandSpy;
@@ -31,30 +30,30 @@ public abstract class SignBlockEntityMixin {
     private final SignBlockEntity self = (SignBlockEntity) (Object) this;
 
     @Shadow
-    private static CommandSourceStack createCommandSourceStack(@Nullable Player player, Level level, BlockPos blockPos) {
+    private static ServerCommandSource createCommandSource(@Nullable PlayerEntity player, World world, BlockPos pos) {
         throw new AssertionError();
     }
 
     @Inject(
-            method = "executeClickCommandsIfPresent",
+            method = "runCommandClickEvent",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/commands/Commands;performPrefixedCommand(Lnet/minecraft/commands/CommandSourceStack;Ljava/lang/String;)I"
+                    target = "Lnet/minecraft/server/command/CommandManager;executeWithPrefix(Lnet/minecraft/server/command/ServerCommandSource;Ljava/lang/String;)V"
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
 
     )
-    private void catchSignCommand(Player player, Level level, BlockPos blockPos, boolean bl, CallbackInfoReturnable<Boolean> cir, boolean bl2, Component[] var6, int var7, int var8, Component component, Style style, ClickEvent clickEvent) {
+    private void catchSignCommand(PlayerEntity player, World world, BlockPos pos, boolean front, CallbackInfoReturnable<Boolean> cir, @Local ClickEvent clickEvent) {
         if (config.logging.logSignCommands) {
 
             // Getting message style from config
             String message = CommandSpy.config.messages.signMessageStyle;
 
             // Getting other info
-            String dimension = self.getLevel().dimension().location().toString();
-            int x = self.getBlockPos().getX();
-            int y = self.getBlockPos().getY();
-            int z = self.getBlockPos().getZ();
+            String dimension = world.getDimension().effects().getNamespace() + ":" + world.getDimension().effects().getPath();
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
 
             // Saving those to hashmap for fancy printing with logger
             Map<String, String> valuesMap = new HashMap<>();
@@ -66,7 +65,7 @@ public abstract class SignBlockEntityMixin {
             StrSubstitutor sub = new StrSubstitutor(valuesMap);
 
             // Logging to console
-            CommandSpy.logCommand(sub.replace(message), createCommandSourceStack(player, self.getLevel(), self.getBlockPos()), MODID + ".log.signs");
+            CommandSpy.logCommand(sub.replace(message), createCommandSource(player, world, pos), MODID + ".log.signs");
         }
     }
 }

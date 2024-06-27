@@ -1,8 +1,8 @@
 package org.samo_lego.commandspy.mixin;
 
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.world.level.BaseCommandBlock;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.world.CommandBlockExecutor;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
 import org.samo_lego.commandspy.CommandSpy;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,29 +17,31 @@ import java.util.Map;
 import static org.samo_lego.commandspy.CommandSpy.MODID;
 
 
-@Mixin(BaseCommandBlock.class)
+@Mixin(CommandBlockExecutor.class)
 public abstract class MixinCommandBlockExecutor {
 
-    @Shadow public abstract String getCommand();
+    @Shadow
+    public abstract String getCommand();
 
-    @Shadow public abstract CommandSourceStack createCommandSourceStack();
+    @Shadow
+    public abstract ServerCommandSource getSource();
 
     // Injection for command block executing commands
-    @Inject(method = "performCommand", at = @At(value = "RETURN"))
-    private void execute(Level world, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "execute", at = @At(value = "RETURN"))
+    private void execute(World world, CallbackInfoReturnable<Boolean> cir) {
         // Checking if mixin should be enabled todo
         boolean enabled = CommandSpy.config.logging.logCommandBlockCommands;
         String command = this.getCommand();
 
-        if(enabled && CommandSpy.shouldLog(command)) {
+        if (enabled && CommandSpy.shouldLog(command)) {
             // Getting message style from config
             String message = CommandSpy.config.messages.commandBlockMessageStyle;
 
             // Getting other info
-            String dimension = world.dimension().location().toString();
-            int x = (int) (this.createCommandSourceStack().getPosition().x() - 0.5);
-            int y = (int) this.createCommandSourceStack().getPosition().y();
-            int z = (int) (this.createCommandSourceStack().getPosition().z() - 0.5);
+            String dimension = world.getDimension().effects().getNamespace() + ":" + world.getDimension().effects().getPath();
+            int x = (int) (this.getSource().getPosition().x - 0.5);
+            int y = (int) this.getSource().getPosition().y;
+            int z = (int) (this.getSource().getPosition().z - 0.5);
 
             // Saving those to hashmap for fancy printing with logger
             Map<String, String> valuesMap = new HashMap<>();
@@ -51,7 +53,7 @@ public abstract class MixinCommandBlockExecutor {
             StrSubstitutor sub = new StrSubstitutor(valuesMap);
 
             // Logging to console
-            CommandSpy.logCommand(sub.replace(message), ((BaseCommandBlock) (Object) this).createCommandSourceStack(), MODID + ".log.command_blocks");
+            CommandSpy.logCommand(sub.replace(message), getSource(), MODID + ".log.command_blocks");
         }
     }
 }
