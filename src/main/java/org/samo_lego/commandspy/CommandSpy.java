@@ -24,6 +24,16 @@ public class CommandSpy implements ModInitializer {
     public static boolean luckpermsLoaded;
     public static SpyConfig config;
 
+    @Override
+    public void onInitialize() {
+        // Info that mod is loading ...
+        LOGGER.info("Loading CommandSpy by samo_lego.");
+        // Loading config
+        config = SpyConfig.loadConfig(new File(configDirectory.toString() + "/CommandSpyConfig.json"));
+
+        luckpermsLoaded = FabricLoader.getInstance().isModLoaded("luckperms");
+    }
+
     /**
      * Determines whether command should be logged, depending on config
      *
@@ -31,8 +41,9 @@ public class CommandSpy implements ModInitializer {
      * @return true if it should be logged, otherwise false
      */
     public static boolean shouldLog(String command) {
-        if (command.startsWith("/"))
+        if (command.startsWith("/")) {
             command = command.substring(1);
+        }
 
         // If command is on the (config) blacklist, it shouldn't be logged to console
         return !config.blacklistedCommands.contains(command.split(" ")[0]);
@@ -67,16 +78,5 @@ public class CommandSpy implements ModInitializer {
             // Vanilla way - all ops get message
             ((ServerCommandSourceAccessor) source).invokeSendToOps(text);
         }
-    }
-
-    @Override
-    public void onInitialize() {
-        // Info that mod is loading ...
-        LOGGER.info("Loading CommandSpy by samo_lego.");
-        // Loading config
-        config = SpyConfig.loadConfig(new File(configDirectory.toString() + "/CommandSpyConfig.json"));
-
-        luckpermsLoaded = FabricLoader.getInstance().isModLoaded("luckperms");
-        LOGGER.info(luckpermsLoaded);
     }
 }

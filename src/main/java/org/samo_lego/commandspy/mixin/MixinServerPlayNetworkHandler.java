@@ -20,7 +20,6 @@ import static org.samo_lego.commandspy.CommandSpy.MODID;
 
 // Mojang: ServerGamePacketListenerImpl
 // Yarn: ServerPlayNetworkHandler
-
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class MixinServerPlayNetworkHandler {
     @Shadow
@@ -33,7 +32,7 @@ public abstract class MixinServerPlayNetworkHandler {
             method = "onCommandExecution",
             at = @At(value = "RETURN")
     )
-    private void onChatMessage(CommandExecutionC2SPacket packet, CallbackInfo ci) {
+    private void onCommandExecution(CommandExecutionC2SPacket packet, CallbackInfo ci) {
         boolean enabled = CommandSpy.config.logging.logPlayerCommands;
         String command = packet.command();
 
@@ -59,5 +58,4 @@ public abstract class MixinServerPlayNetworkHandler {
             CommandSpy.logCommand(sub.replace(message), player.getCommandSource(), MODID + ".log.players");
         }
     }
-    // TODO: (For 1.21) Signed Packet
 }

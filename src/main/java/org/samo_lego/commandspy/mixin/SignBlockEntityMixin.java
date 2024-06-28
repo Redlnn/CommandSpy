@@ -41,7 +41,6 @@ public abstract class SignBlockEntityMixin {
                     target = "Lnet/minecraft/server/command/CommandManager;executeWithPrefix(Lnet/minecraft/server/command/ServerCommandSource;Ljava/lang/String;)V"
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
-
     )
     private void catchSignCommand(PlayerEntity player, World world, BlockPos pos, boolean front, CallbackInfoReturnable<Boolean> cir, @Local ClickEvent clickEvent) {
         if (config.logging.logSignCommands) {
