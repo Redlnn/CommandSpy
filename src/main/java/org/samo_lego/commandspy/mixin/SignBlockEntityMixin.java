@@ -26,9 +26,6 @@ import static org.samo_lego.commandspy.CommandSpy.config;
 
 @Mixin(SignBlockEntity.class)
 public abstract class SignBlockEntityMixin {
-    @Unique
-    private final SignBlockEntity self = (SignBlockEntity) (Object) this;
-
     @Shadow
     private static ServerCommandSource createCommandSource(@Nullable PlayerEntity player, World world, BlockPos pos) {
         throw new AssertionError();
@@ -46,7 +43,7 @@ public abstract class SignBlockEntityMixin {
         if (config.logging.logSignCommands) {
 
             // Getting message style from config
-            String message = CommandSpy.config.messages.signMessageStyle;
+            String message = CommandSpy.config.messages.signMessage;
 
             // Getting other info
             String dimension = world.getDimension().effects().getNamespace() + ":" + world.getDimension().effects().getPath();

@@ -10,7 +10,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
-import org.samo_lego.commandspy.mixin.ServerCommandSourceAccessor;
 import org.samo_lego.commandspy.permission.PermissionHelper;
 
 import java.io.File;
@@ -76,7 +75,12 @@ public class CommandSpy implements ModInitializer {
             });
         } else if (config.logging.logToOps) {
             // Vanilla way - all ops get message
-            ((ServerCommandSourceAccessor) source).invokeSendToOps(text);
+            Text message = Text.translatable("chat.type.admin", source.getDisplayName(), text).formatted(Formatting.GRAY, Formatting.ITALIC);
+            for (ServerPlayerEntity serverPlayerEntity : source.getServer().getPlayerManager().getPlayerList()) {
+                if (serverPlayerEntity != source.getPlayer() && source.getServer().getPlayerManager().isOperator(serverPlayerEntity.getGameProfile())) {
+                    serverPlayerEntity.sendMessage(message);
+                }
+            }
         }
     }
 }

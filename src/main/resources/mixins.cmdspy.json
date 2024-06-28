@@ -7,7 +7,6 @@
   "server": [
     "MixinCommandBlockExecutor",
     "MixinServerPlayNetworkHandler",
-    "ServerCommandSourceAccessor",
     "SignBlockEntityMixin"
   ],
   "injectors": {
