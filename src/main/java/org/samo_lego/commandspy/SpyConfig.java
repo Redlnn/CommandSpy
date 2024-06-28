@@ -24,9 +24,7 @@ public class SpyConfig {
             .create();
     public LogConfig logging = new LogConfig();
     public MessageConfig messages = new MessageConfig();
-    public List<String> blacklistedCommands = new ArrayList<>(Arrays.asList(
-            "msg",
-            "w",
+    public List<String> blacklistedCommands = new ArrayList<>(List.of(
             "testCommandThatShouldNotBeLogged"
     ));
 
@@ -79,19 +77,22 @@ public class SpyConfig {
         public boolean logCommandBlockCommands = true;
 
         /**
+         * Only log commands executed successfully by command blocks.
+         */
+        public boolean logCommandBlockWhenSuccessful = true;
+
+        /**
          * Whether commands executed by signs should be logged.
          */
         public boolean logSignCommands = true;
-
 
         /**
          * Whether to log the commands to server console.
          */
         public boolean logToConsole = true;
 
-
         /**
-         * Whether to log the commands to online OPs.
+         * Whether to log the commands to online OPs or any people who are granted permission.
          */
         public boolean logToOps = true;
     }
@@ -99,18 +100,19 @@ public class SpyConfig {
     public static class MessageConfig {
 
         /**
-         * Message that is sent when command from command block is executed
+         * Message that is sent when command from command block.
          */
-        public String commandBlockMessageStyle = "Command block in: ${dimension} at X: ${x} Y: ${y} Z: ${z} executed command: ${command}";
+        public String commandBlockSuccessMessage = "Command block in: ${dimension} at X: ${x} Y: ${y} Z: ${z} executed command: ${command}";
+        public String commandBlockFailedMessage = "Command block in: ${dimension} at X: ${x} Y: ${y} Z: ${z} try to execute command: ${command}";
 
         /**
          * Message that is sent when player enters command
          */
-        public String playerMessageStyle = "Player ${playername} (UUID: ${uuid}) used command: ${command}";
+        public String playerMessage = "Player ${playername} (UUID: ${uuid}) used command: ${command}";
 
         /**
          * Message that is sent when command from sign is executed
          */
-        public String signMessageStyle = "Sign in: ${dimension} at X: ${x} Y: ${y} Z: ${z} executed command: ${command}";
+        public String signMessage = "Sign in: ${dimension} at X: ${x} Y: ${y} Z: ${z} executed command: ${command}";
     }
 }
