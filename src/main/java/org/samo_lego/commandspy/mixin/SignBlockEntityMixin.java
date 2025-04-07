@@ -5,6 +5,7 @@ import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.ClickEvent.RunCommand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.core.lookup.StrSubstitutor;
@@ -15,7 +16,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +35,10 @@ public abstract class SignBlockEntityMixin {
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/command/CommandManager;executeWithPrefix(Lnet/minecraft/server/command/ServerCommandSource;Ljava/lang/String;)V"
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD
+            )
     )
     private void catchSignCommand(PlayerEntity player, World world, BlockPos pos, boolean front, CallbackInfoReturnable<Boolean> cir, @Local ClickEvent clickEvent) {
-        if (config.logging.logSignCommands) {
+        if (config.logging.logSignCommands && clickEvent instanceof ClickEvent.RunCommand(String command)) {
 
             // Getting message style from config
             String message = CommandSpy.config.messages.signMessage;
@@ -53,7 +52,7 @@ public abstract class SignBlockEntityMixin {
             // Saving those to hashmap for fancy printing with logger
             Map<String, String> valuesMap = new HashMap<>();
             valuesMap.put("dimension", dimension);
-            valuesMap.put("command", clickEvent.getValue());
+            valuesMap.put("command", command);
             valuesMap.put("x", String.valueOf(x));
             valuesMap.put("y", String.valueOf(y));
             valuesMap.put("z", String.valueOf(z));
